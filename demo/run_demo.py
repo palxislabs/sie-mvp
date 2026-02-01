@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
+import json
 
 # Ensure repo root is on PYTHONPATH
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-import json
+
 from pathlib import Path
 
 from sie_lib import verify_envelope
@@ -18,11 +19,10 @@ def load_trusted_instructions(envelope_path: Path) -> dict:
     if not issuer:
         raise SystemExit("Envelope missing issuer")
 
-    keyring_path = repo_root / "trusted_issuers.json"
+    keyring_path = REPO_ROOT / "trusted_issuers.json"
     if not keyring_path.exists():
         raise SystemExit("trusted_issuers.json not found")
 
-    import json
     keyring = json.loads(keyring_path.read_text(encoding="utf-8"))
 
     pub = keyring.get(issuer)
