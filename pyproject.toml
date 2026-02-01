@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sie-mvp"
+version = "0.1.0"
+description = "Signed Instruction Envelope (SIE) MVP: signed agent instructions + trusted issuer keyring + policy hooks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Palxis Labs" }]
+dependencies = [
+  "pynacl>=1.6.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/palxis-labs/sie-mvp"
+
+[tool.setuptools]
+py-modules = ["sie_lib", "sie_policy", "sie_sign", "sie_verify"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["integrations*"]
