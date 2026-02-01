@@ -1,3 +1,5 @@
+# Security-critical exclusions:
+# - private signing keys MUST NEVER be committed
 # Python
 __pycache__/
 *.pyc
