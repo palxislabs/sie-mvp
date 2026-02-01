@@ -67,21 +67,25 @@ See: `THREAT_MODEL.md`
 ### Install dependency
 ```bash
 python -m pip install pynacl
+bash
 
 ### Sign a skill file
-```bash
+'''bash
 python sie_sign.py --issuer palxislabs --infile SKILL.md --deny-prompt-disclosure --no-external-urls --max-output-tokens 1200
+bash
 
 ### Verify the envelope
-```bash
+'''bash
 python sie_verify.py --file SKILL.md.sie.json
+bash
 
 ### Verify + bind to the on-disk skill file (detects tampering)
-```bash
+'''bash
 python sie_verify.py --file SKILL.md.sie.json --check-file SKILL.md
+bash
 
 ### Demo: Indirect prompt injection is blocked
-```bash
+'''bash
 python demo/run_demo.py
-
+bash
 
