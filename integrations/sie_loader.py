@@ -49,7 +49,9 @@ def load_verified_instructions(
         raise ValueError("Envelope missing issuer")
 
     # 1) Registry presence check (objective)
-    reg = RegistryClient(registry_dir=Path("registry"))
+    reg = RegistryClient(
+        base_url="https://palxis-labs.github.io/sie-mvp",
+    )
     if not reg.is_issuer_present(issuer):
         raise ValueError(f"Issuer '{issuer}' not present in registry snapshot")
 
