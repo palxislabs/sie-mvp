@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from integrations.openclaw_sie_config import load_sie_runtime_config
 from integrations.sie_enforcement import evaluate_skill
 
 
@@ -19,16 +20,29 @@ def main() -> int:
     p.add_argument("--verify-script", default="sie_verify.py", help="Path to verifier script")
     p.add_argument("--trusted-issuers", default="trusted_issuers.json", help="Path to trusted issuers keyring")
     p.add_argument("--envelope-suffix", default=".sie.json", help="Envelope suffix (default: .sie.json)")
+    p.add_argument("--config", help="Optional OpenClaw JSON config path (uses agents.security.sie.*)")
     p.add_argument("--json", action="store_true", help="Emit decision as JSON")
 
     args = p.parse_args()
 
+    mode = args.mode
+    verify_script = Path(args.verify_script)
+    trusted_issuers = Path(args.trusted_issuers)
+    envelope_suffix = args.envelope_suffix
+
+    if args.config:
+        cfg = load_sie_runtime_config(Path(args.config))
+        mode = cfg.mode
+        verify_script = cfg.verify_script
+        trusted_issuers = cfg.trusted_issuers
+        envelope_suffix = cfg.envelope_suffix
+
     decision = evaluate_skill(
         Path(args.skill),
-        mode=args.mode,
-        verify_script=Path(args.verify_script),
-        trusted_issuers=Path(args.trusted_issuers),
-        envelope_suffix=args.envelope_suffix,
+        mode=mode,
+        verify_script=verify_script,
+        trusted_issuers=trusted_issuers,
+        envelope_suffix=envelope_suffix,
     )
 
     if args.json:
