@@ -60,8 +60,8 @@ See: `THREAT_MODEL.md`
 ---
 ## Quickstart
 
-> **Note (Windows):** activate the virtual environment before running commands:  
-> `.\.venv\Scripts\activate`
+> **Windows PowerShell:** `& .\.venv\Scripts\Activate.ps1`  
+> **Linux/macOS:** `source .venv/bin/activate`
 
 ### Install dependency
 ```bash
@@ -70,22 +70,37 @@ python -m pip install pynacl
 
 ### Sign a skill file
 ```bash
-python sie_sign.py --issuer palxislabs --infile SKILL.md --deny-prompt-disclosure --no-external-urls --max-output-tokens 1200
+python sie_sign.py --issuer palxislabs --infile SKILL.md
 ```
 
-### Verify the envelope
+### Verify the envelope with trusted issuers
 ```bash
-python sie_verify.py --file SKILL.md.sie.json
+python sie_verify.py --file SKILL.md.sie.json --trusted-issuers trusted_issuers.json
 ```
 
-### Verify + bind to the on-disk skill file (detects tampering)
+### Verify + bind to on-disk file (tamper detection)
 ```bash
-python sie_verify.py --file SKILL.md.sie.json --check-file SKILL.md
+python sie_verify.py --file SKILL.md.sie.json --trusted-issuers trusted_issuers.json --check-file SKILL.md
+```
+
+## Helper scripts (recommended)
+
+### Windows (PowerShell)
+```powershell
+.\scripts\sign.ps1
+.\scripts\verify.ps1
+```
+
+### Linux/macOS
+```bash
+./scripts/sign.sh
+./scripts/verify.sh
 ```
 
 ### Demo: Indirect prompt injection is blocked
 ```bash
 python demo/run_demo.py
 ```
+
 ## License
 MIT
