@@ -15,6 +15,9 @@ def main() -> int:
     p.add_argument("--file", required=True, help="Path to .sie.json file")
     p.add_argument("--pubkey", required=False, help="Public key base64 (optional if envelope includes public_key)")
     p.add_argument("--check-file", required=False, help="Path to external file to hash-check against payload.sha256")
+    p.add_argument("--trusted-issuers", required=False, default="trusted_issuers.json",
+    help="Path to trusted issuer keyring JSON (default: trusted_issuers.json)")
+
     args = p.parse_args()
 
     f = Path(args.file)
@@ -27,7 +30,7 @@ def main() -> int:
     if not issuer:
         raise SystemExit("Envelope missing issuer field")
 
-    keyring = load_trusted_issuers(Path("trusted_issuers.json"))
+    keyring = load_trusted_issuers(Path(args.trusted_issuers))
 
     pub = keyring.get(issuer)
     if not pub:
