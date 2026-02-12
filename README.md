@@ -65,6 +65,8 @@ See: `THREAT_MODEL.md`
 - `docs/VALIDATION.md` — reproducible verification commands + expected outputs
 - `docs/OPENCLAW_INTEGRATION.md` — OpenClaw loader enforcement integration plan
 - `docs/IMPLEMENTATION_TICKETS.md` — implementation-ready ticket breakdown
+- `docs/OPENCLAW_EXECUTION_PLAN.md` — execution sequence from design to core patch
+- `docs/OPENCLAW_PR_TEMPLATE.md` — upstream PR template for OpenClaw proposal
 
 ---
 ## Quickstart
