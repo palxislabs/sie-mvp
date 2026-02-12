@@ -1,22 +1,56 @@
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 from sie_lib import verify_envelope
 
+
 def load_trusted_issuers(path: Path) -> dict:
     if not path.exists():
         raise SystemExit(f"Trusted issuer file not found: {path}")
-    import json
-    return json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise SystemExit("Trusted issuer file must be a JSON object: {issuer: pubkey_b64}")
+    return data
+
+
+def resolve_issuer(env: dict) -> str:
+    issuer = env.get("issuer") or env.get("payload", {}).get("issuer")
+    if not issuer:
+        raise SystemExit("Envelope missing issuer field")
+    return issuer
+
+
+def resolve_pubkey(env: dict, args) -> str:
+    # 1) Explicit CLI pubkey override (highest priority)
+    if args.pubkey:
+        return args.pubkey
+
+    # 2) Trusted keyring lookup by issuer
+    issuer = resolve_issuer(env)
+    keyring = load_trusted_issuers(Path(args.trusted_issuers))
+    pub = keyring.get(issuer)
+    if not pub:
+        raise ValueError(f"Issuer '{issuer}' is not trusted.")
+    return pub
+
 
 def main() -> int:
     p = argparse.ArgumentParser(description="Verify a .sie.json envelope (SIE v0.1).")
     p.add_argument("--file", required=True, help="Path to .sie.json file")
-    p.add_argument("--pubkey", required=False, help="Public key base64 (optional if envelope includes public_key)")
-    p.add_argument("--check-file", required=False, help="Path to external file to hash-check against payload.sha256")
-    p.add_argument("--trusted-issuers", required=False, default="trusted_issuers.json",
-    help="Path to trusted issuer keyring JSON (default: trusted_issuers.json)")
+    p.add_argument("--pubkey", required=False, help="Public key base64 override")
+    p.add_argument(
+        "--check-file",
+        required=False,
+        help="Path to external file to hash-check against payload.sha256",
+    )
+    p.add_argument(
+        "--trusted-issuers",
+        required=False,
+        default="trusted_issuers.json",
+        help="Path to trusted issuer keyring JSON (default: trusted_issuers.json)",
+    )
 
     args = p.parse_args()
 
@@ -26,27 +60,16 @@ def main() -> int:
 
     env = json.loads(f.read_text(encoding="utf-8"))
 
-    issuer = env.get("issuer")
-    if not issuer:
-        raise SystemExit("Envelope missing issuer field")
-
-    keyring = load_trusted_issuers(Path(args.trusted_issuers))
-
-    pub = keyring.get(issuer)
-    if not pub:
-        print(f"[FAIL] Issuer '{issuer}' is not trusted.")
-        return 2
-
     try:
+        pub = resolve_pubkey(env, args)
         verify_envelope(env, pub)
+
         if args.check_file:
             cf = Path(args.check_file)
             if not cf.exists():
                 raise SystemExit(f"Check file not found: {cf}")
 
-            content = cf.read_text(encoding="utf-8")
-            import hashlib
-            disk_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+            disk_hash = hashlib.sha256(cf.read_bytes()).hexdigest()
             env_hash = env.get("payload", {}).get("sha256")
 
             if not env_hash:
@@ -56,6 +79,7 @@ def main() -> int:
             if disk_hash != env_hash:
                 print("[FAIL] External file hash does not match signed payload.sha256 (file was modified).")
                 return 2
+
     except ValueError as e:
         print(f"[FAIL] {e}")
         return 2

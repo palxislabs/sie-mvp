@@ -40,6 +40,37 @@ class TestVerifyCli(unittest.TestCase):
         self.assertEqual(r.returncode, 0, msg=r.stdout + r.stderr)
         self.assertIn("[OK]", r.stdout)
 
+    def test_verify_ok_with_pubkey_override(self):
+        env = json.loads(self.env_file.read_text(encoding="utf-8"))
+        issuer = env.get("issuer")
+        keyring = json.loads(self.keyring.read_text(encoding="utf-8"))
+        pub = keyring[issuer]
+
+        r = self.run_cmd(
+            "--file", str(self.env_file),
+            "--pubkey", pub,
+        )
+        self.assertEqual(r.returncode, 0, msg=r.stdout + r.stderr)
+        self.assertIn("[OK]", r.stdout)
+
+    def test_payload_issuer_fallback_works(self):
+        env = json.loads(self.env_file.read_text(encoding="utf-8"))
+        issuer = env.get("issuer")
+        env.pop("issuer", None)
+        env.setdefault("payload", {})["issuer"] = issuer
+
+        tmp_env = self.root / "tests" / "tmp_payload_issuer.sie.json"
+        try:
+            tmp_env.write_text(json.dumps(env), encoding="utf-8")
+            r = self.run_cmd(
+                "--file", str(tmp_env),
+                "--trusted-issuers", str(self.keyring),
+            )
+            self.assertEqual(r.returncode, 0, msg=r.stdout + r.stderr)
+            self.assertIn("[OK]", r.stdout)
+        finally:
+            tmp_env.unlink(missing_ok=True)
+
     def test_untrusted_issuer_fails(self):
         bad_keyring = self.root / "tests" / "tmp_bad_issuers.json"
         bad_keyring.write_text("{}", encoding="utf-8")
