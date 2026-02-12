@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## Unreleased
+
+### Added
+- Verifier CLI support for configurable trusted issuer keyring path: `--trusted-issuers`.
+- CLI test coverage for trusted-issuer verification and key failure cases:
+  - untrusted issuer rejection
+  - hash mismatch rejection (`--check-file`)
+  - missing issuer rejection
+  - malformed envelope rejection
+- Cross-platform helper scripts:
+  - `scripts/sign.ps1`, `scripts/verify.ps1`
+  - `scripts/sign.sh`, `scripts/verify.sh`
+- Operator-focused documentation:
+  - `docs/SECURITY_QUICKSTART.md`
+  - `docs/OPERATOR_CHECKLIST.md`
+  - `docs/FAILURE_MODES.md`
+  - `docs/VALIDATION.md`
+  - `docs/ENFORCEMENT_BEHAVIOR.md`
+- OpenClaw integration planning update with PR-ready implementation checklist:
+  - `docs/OPENCLAW_INTEGRATION.md`
+- Project planning docs:
+  - `NEXT_STEPS.md`
+  - `ROADMAP.md`
+
+### Changed
+- `README.md` quickstart now uses trusted-issuer verification flow and references helper scripts + operator docs.
+- Public planning docs were sanitized to avoid exposing private commercial strategy.
+
 ## v0.1.0 — Initial public release
 
 ### Added
