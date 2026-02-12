@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -48,8 +49,52 @@ class TestVerifyCli(unittest.TestCase):
                 "--trusted-issuers", str(bad_keyring),
             )
             self.assertNotEqual(r.returncode, 0)
+            self.assertIn("not trusted", (r.stdout + r.stderr).lower())
         finally:
             bad_keyring.unlink(missing_ok=True)
+
+    def test_hash_mismatch_fails(self):
+        tampered = self.root / "tests" / "tmp_tampered_skill.md"
+        try:
+            tampered.write_text(self.skill_file.read_text(encoding="utf-8") + "\n# tamper\n", encoding="utf-8")
+            r = self.run_cmd(
+                "--file", str(self.env_file),
+                "--trusted-issuers", str(self.keyring),
+                "--check-file", str(tampered),
+            )
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("hash", (r.stdout + r.stderr).lower())
+        finally:
+            tampered.unlink(missing_ok=True)
+
+    def test_missing_issuer_fails(self):
+        env = json.loads(self.env_file.read_text(encoding="utf-8"))
+        env.pop("issuer", None)
+        env.get("payload", {}).pop("issuer", None)
+
+        tmp_env = self.root / "tests" / "tmp_missing_issuer.sie.json"
+        try:
+            tmp_env.write_text(json.dumps(env), encoding="utf-8")
+            r = self.run_cmd(
+                "--file", str(tmp_env),
+                "--trusted-issuers", str(self.keyring),
+            )
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("missing issuer", (r.stdout + r.stderr).lower())
+        finally:
+            tmp_env.unlink(missing_ok=True)
+
+    def test_malformed_envelope_json_fails(self):
+        bad_env = self.root / "tests" / "tmp_malformed.sie.json"
+        try:
+            bad_env.write_text("{not-json", encoding="utf-8")
+            r = self.run_cmd(
+                "--file", str(bad_env),
+                "--trusted-issuers", str(self.keyring),
+            )
+            self.assertNotEqual(r.returncode, 0)
+        finally:
+            bad_env.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
