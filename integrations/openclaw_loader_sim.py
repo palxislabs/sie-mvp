@@ -1,5 +1,12 @@
 import argparse
+import sys
 from pathlib import Path
+
+# Allow running this file directly: `python integrations/openclaw_loader_sim.py ...`
+# by ensuring repo root is on sys.path for `integrations.*` imports.
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from integrations.sie_enforcement import evaluate_skill
 
