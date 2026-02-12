@@ -98,12 +98,14 @@ python sie_verify.py --file SKILL.md.sie.json --trusted-issuers trusted_issuers.
 ```powershell
 .\scripts\sign.ps1
 .\scripts\verify.ps1
+.\scripts\validate_all.ps1
 ```
 
 ### Linux/macOS
 ```bash
 ./scripts/sign.sh
 ./scripts/verify.sh
+./scripts/validate_all.sh
 ```
 
 ### Demo: Indirect prompt injection is blocked
