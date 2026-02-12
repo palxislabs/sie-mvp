@@ -66,7 +66,13 @@ See: `THREAT_MODEL.md`
 - `docs/OPENCLAW_INTEGRATION.md` — OpenClaw loader enforcement integration plan
 - `docs/IMPLEMENTATION_TICKETS.md` — implementation-ready ticket breakdown
 - `docs/OPENCLAW_EXECUTION_PLAN.md` — execution sequence from design to core patch
+- `docs/OPENCLAW_PATCH_SKELETON.md` — minimal patch outline for maintainers
+- `docs/OPENCLAW_UPSTREAM_HANDOFF.md` — single-file maintainer handoff pack
 - `docs/OPENCLAW_PR_TEMPLATE.md` — upstream PR template for OpenClaw proposal
+- `docs/ADOPTION_PATH.md` — staged rollout path (local checks → strict runtime)
+- `docs/DEMO_SCRIPT.md` — 5-minute live demo commands
+- `docs/SECURITY_CLAIMS.md` — accurate claim boundaries (anti-hype)
+- `docs/MAINTAINER_CHECKLIST.md` — pre-release maintainer checklist
 
 ---
 ## Quickstart
