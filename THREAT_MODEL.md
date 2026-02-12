@@ -56,6 +56,25 @@ Outcome: leakage of internal control instructions; improved attacker success and
 SIE mitigation (MVP): reduce plaintext sensitive instruction distribution; require signed instruction artifacts for trusted
 control-plane data; add a policy gate that refuses requests to reveal internal instructions/configuration.
 
+## Concrete Supply-Chain Scenarios (Operator-Facing)
+
+### S1 — Namespace/frontmatter squatting in community skill repos
+Attacker publishes a malicious skill variant that resolves before the intended one due to discovery/order logic
+(e.g., name collision in metadata).
+Outcome without strong trust checks: wrong skill is installed as if legitimate.
+SIE mitigation: envelope verification ties trust to issuer key, not to display name or discovery order.
+
+### S2 — Malicious skill substitution after install
+A legitimate `SKILL.md` is replaced or edited on disk post-install by another process/user.
+Outcome without integrity check: agent executes modified instructions.
+SIE mitigation: `--check-file` hash binding detects file tampering and rejects trust.
+
+### S3 — Issuer private key compromise
+Attacker steals a trusted issuer's signing key and produces valid signatures.
+Outcome: cryptographic verification alone cannot distinguish attacker output.
+MVP status: not fully solved. Requires key rotation, revocation, and short trust windows in later versions.
+Operator mitigation now: keep trusted keyring minimal, monitor issuer behavior, and be ready to remove compromised issuers quickly.
+
 ## Out-of-Scope (Explicitly Not Solved by MVP)
 - Model-level jailbreaks that ignore policies even with signed instructions
 - Vulnerabilities in the agent runtime, tool implementations, OS, or sandbox escape
